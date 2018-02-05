@@ -35,7 +35,39 @@ def get_pingshu_list(url):
         pingshu_list.append((pingshu_name,pingshu_href))
     return pingshu_list
 
+def get_pingshu_downloadurl(url):
+    r = requests.get(url,timeout =30)
+    r.encoding = 'gb2312'
+    bs = BeautifulSoup(r.text,'lxml')
+    pingshu_download_list =[]
+    # dict/list 之间的区别
+    # pingshu_form = bs.find_all('form',name='form')[1]
+    pingshu_li = bs.find_all('li',class_='a1')
+    print(pingshu_li.__len__())
+    for i in range(0,pingshu_li.__len__()-1):
+       # pingshu_download_list.append((pingshu_download_bs[i],text,pingshu_download_bs[i]['href']))
+       # repeat this mistake so many times, need to find <a> further more
+       name = pingshu_li[i].find('a').text
+       href = pingshu_li[i].find('a')['href']
+       pingshu_download_list.append((name,href))
+       print(name,href)
+    return pingshu_download_list
 
+
+def get_url(url):
+    # jsString = 'pingshu://cc%252Fbzmtv%255FInc%252Fdownload%252Easp%253Ffid%253D102539akb%253D%253D'
+    url = parse.unquote(parse.unquote(url[10:]))
+    # print(jsString[2:-5])
+    url = 'http://www.pingshu8.com' + url[2:-5]
+    r = requests.get(url, timeout=30)
+    print(url + '\n' + r.text + '*************')
+"""
+    var downurl ="pingshu://cc%252Fbzmtv%255FInc%252Fdownload%252Easp%253Ffid%253D102539akb%253D%253D"
+    downurl=decodeURIComponent(decodeURIComponent(downurl.substr(10,downurl.length-1)))
+    downurl=downurl.substr(2,downurl.length-7)
+*********************************************************
+    functions upon the line is the pingshu8.com's javascript function in web
+"""
 
 def main():
 
@@ -55,6 +87,9 @@ def main():
         pingshu_name = name[0]
         print(pingshu_name,pingshu_href)
         psfile.write('《{}》，链接：{}\n'.format(pingshu_name,pingshu_href))
+        pingshu_download_list = get_pingshu_downloadurl(pingshu_href)
+        for story in pingshu_download_list:
+            psfile.write('{}，链接:{}\n'.format(story[0],story[1]))
     i+=1
     all_actors[city_name] = pinglist.__len__()
     psfile.write('*********************************************\n')
@@ -66,16 +101,9 @@ def main():
  # print(sorted(dict,key=lambda x:dict[x])[-1])
 
 if __name__=='__main__':
-    jsString = 'pingshu://cc%252Fbzmtv%255FInc%252Fdownload%252Easp%253Ffid%253D102539akb%253D%253D'
-    jsString = parse.unquote(parse.unquote(jsString[10:]))
-    # print(jsString[2:-5])
-    url = 'http://www.pingshu8.com'+jsString[2:-5]
-    r = requests.get(url,timeout=30)
-    print(url+'\n'+r.text+'*************')
-"""
-	var downurl ="pingshu://cc%252Fbzmtv%255FInc%252Fdownload%252Easp%253Ffid%253D102539akb%253D%253D"
-	downurl=decodeURIComponent(decodeURIComponent(downurl.substr(10,downurl.length-1)))
-	downurl=downurl.substr(2,downurl.length-7)
-
-"""
-   # main()
+    # main()
+    # get_url('pingshu://cc%252Fbzmtv%255FInc%252Fdownload%252Easp%253Ffid%253D102539akb%253D%253D')
+    pingshu_download_list = get_pingshu_downloadurl('http://www.pingshu8.com/MusicList/mmc_235_6576_1.Htm')
+    for story in pingshu_download_list:
+        print('{}，链接:{}\n'.format(story[0], story[1]))
+        print(pingshu_download_list.__len__())
