@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import lxml
 from urllib import parse
+from selenium import webdriver
 
 def get_all_peoples():
     url = 'http://www.pingshu8.com/Music/bzmtv_1.Htm'
@@ -25,6 +26,7 @@ def get_pingshu_list(url):
     url ='http://www.pingshu8.com'+url
 #    /Special/Msp_21.Htm'
     r = requests.get(url,timeout = 30)
+
     r.encoding = 'gb2312'
     soup = BeautifulSoup(r.text,'lxml')
     pingshu_div_list = soup.find_all('div',class_='tab33')
@@ -36,22 +38,38 @@ def get_pingshu_list(url):
     return pingshu_list
 
 def get_pingshu_downloadurl(url):
-    r = requests.get(url,timeout =30)
-    r.encoding = 'gb2312'
-    bs = BeautifulSoup(r.text,'lxml')
-    pingshu_download_list =[]
-    # dict/list 之间的区别
-    # pingshu_form = bs.find_all('form',name='form')[1]
-    pingshu_li = bs.find_all('li',class_='a1')
-    print(pingshu_li.__len__())
-    for i in range(0,pingshu_li.__len__()-1):
-       # pingshu_download_list.append((pingshu_download_bs[i],text,pingshu_download_bs[i]['href']))
-       # repeat this mistake so many times, need to find <a> further more
-       name = pingshu_li[i].find('a').text
-       href = pingshu_li[i].find('a')['href']
-       pingshu_download_list.append((name,href))
-       print(name,href)
-    return pingshu_download_list
+    # chromedriver = '/usr/lib/chromium-browser/chromedriver'
+    phantomPath = '/home/eric/anaconda3/bin/phantomjs'
+    browser = webdriver.PhantomJS(phantomPath)
+    # Chrome(chromedriver)
+    browser.get(url)
+    elem = browser.find_elements_by_class_name('a1')
+    downhref = browser.find_elements_by_class_name('a2')
+    print(elem.__len__())
+    for i in range(0,elem.__len__()):
+        # range范围不包括最后一个数，不用减一
+        print(i)
+        print(downhref[i].find_element_by_tag_name('a').get_attribute('href'))
+        print(elem[i].find_element_by_tag_name('a').get_attribute('innerHTML'))
+
+    browser.close()
+    # r = requests.get(url,timeout =30)
+    # r.encoding = 'gb2312'
+    # bs = BeautifulSoup(r.text,'lxml')
+    # print(bs.text)
+    # pingshu_download_list =[]
+    # # dict/list 之间的区别
+    # # pingshu_form = bs.find_all('form',name='form')[1]
+    # pingshu_li = bs.find_all('li',class_='a1')
+    # print(pingshu_li.__len__())
+    # for i in range(0,pingshu_li.__len__()-1):
+    #    # pingshu_download_list.append((pingshu_download_bs[i],text,pingshu_download_bs[i]['href']))
+    #    # repeat this mistake so many times, need to find <a> further more
+    #    name = pingshu_li[i].find('a').text,i
+    #    href = pingshu_li[i].find('a')['href'],i
+    #    pingshu_download_list.append((name,href))
+    #    print(name,href)
+    # return pingshu_download_list
 
 
 def get_url(url):
@@ -104,6 +122,7 @@ if __name__=='__main__':
     # main()
     # get_url('pingshu://cc%252Fbzmtv%255FInc%252Fdownload%252Easp%253Ffid%253D102539akb%253D%253D')
     pingshu_download_list = get_pingshu_downloadurl('http://www.pingshu8.com/MusicList/mmc_235_6576_1.Htm')
-    for story in pingshu_download_list:
-        print('{}，链接:{}\n'.format(story[0], story[1]))
-        print(pingshu_download_list.__len__())
+    # print(pingshu_download_list.__len__())
+    # for story in pingshu_download_list:
+    #     print('{}，链接:{}\n'.format(story[0], story[1]))
+    #     #print(pingshu_download_list.__len__())
