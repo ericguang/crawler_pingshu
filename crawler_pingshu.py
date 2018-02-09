@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import lxml
 from urllib import parse
 from selenium import webdriver
+import time
 
 def get_all_peoples():
     url = 'http://www.pingshu8.com/Music/bzmtv_1.Htm'
@@ -14,7 +15,7 @@ def get_all_peoples():
     div_list = soup.find_all('div',class_='t2')[0]
     #div_list = soup.find_all('a')
     people_div_list = div_list.find_all('a')
-    #city_link_list = city_div.find_all('a')
+    #city_link_list = city_div.find_all('a')id="clickina"
     for i in range(0,people_div_list.__len__()):
         people_name = people_div_list[i].text
         people_href = people_div_list[i]['href']
@@ -31,7 +32,7 @@ def get_pingshu_list(url):
     soup = BeautifulSoup(r.text,'lxml')
     pingshu_div_list = soup.find_all('div',class_='tab33')
 
-    for i in range(0,pingshu_div_list.__len__()-1):
+    for i in range(0,pingshu_div_list.__len__()):
         pingshu_name = pingshu_div_list[i].find('a').text
         pingshu_href = pingshu_div_list[i].find('a')['href']
         pingshu_list.append((pingshu_name,pingshu_href))
@@ -62,7 +63,7 @@ def get_pingshu_downloadurl(url):
     # # pingshu_form = bs.find_all('form',name='form')[1]
     # pingshu_li = bs.find_all('li',class_='a1')
     # print(pingshu_li.__len__())
-    # for i in range(0,pingshu_li.__len__()-1):
+    # for i in range(0,pingshu_li.__len__()):
     #    # pingshu_download_list.append((pingshu_download_bs[i],text,pingshu_download_bs[i]['href']))
     #    # repeat this mistake so many times, need to find <a> further more
     #    name = pingshu_li[i].find('a').text,i
@@ -71,6 +72,15 @@ def get_pingshu_downloadurl(url):
     #    print(name,href)
     # return pingshu_download_list
 
+def download_pingshu(url):
+    phantomjsPath = '/home/eric/anaconda3/bin/phantomjs'
+    # chromedriver = '/usr/lib/chromium-browser/chromedriver'
+    browser = webdriver.PhantomJS(phantomjsPath)
+    # browser = webdriver.Chrome(chromedriver)
+    browser.get(url)
+    browser.find_element_by_id('clickina').click()
+    time.sleep(1)
+    # browser.close()
 
 def get_url(url):
     # jsString = 'pingshu://cc%252Fbzmtv%255FInc%252Fdownload%252Easp%253Ffid%253D102539akb%253D%253D'
@@ -121,8 +131,10 @@ def main():
 if __name__=='__main__':
     # main()
     # get_url('pingshu://cc%252Fbzmtv%255FInc%252Fdownload%252Easp%253Ffid%253D102539akb%253D%253D')
-    pingshu_download_list = get_pingshu_downloadurl('http://www.pingshu8.com/MusicList/mmc_235_6576_1.Htm')
+    # pingshu_download_list = get_pingshu_downloadurl('http://www.pingshu8.com/MusicList/mmc_235_6576_1.Htm')
     # print(pingshu_download_list.__len__())
     # for story in pingshu_download_list:
     #     print('{}，链接:{}\n'.format(story[0], story[1]))
     #     #print(pingshu_download_list.__len__())
+    url = 'http://www.pingshu8.com/down_294730.html'
+    download_pingshu(url)
