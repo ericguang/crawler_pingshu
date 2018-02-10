@@ -4,6 +4,7 @@ import lxml
 from urllib import parse
 from selenium import webdriver
 import time
+from contextlib import closing
 
 def get_all_peoples():
     url = 'http://www.pingshu8.com/Music/bzmtv_1.Htm'
@@ -72,15 +73,39 @@ def get_pingshu_downloadurl(url):
     #    print(name,href)
     # return pingshu_download_list
 
-def download_pingshu(url):
-    phantomjsPath = '/home/eric/anaconda3/bin/phantomjs'
-    # chromedriver = '/usr/lib/chromium-browser/chromedriver'
-    browser = webdriver.PhantomJS(phantomjsPath)
-    # browser = webdriver.Chrome(chromedriver)
+def download_pingshu(name,url):
+    # phantomjsPath = '/home/eric/anaconda3/bin/phantomjs'
+    # browser = webdriver.PhantomJS(phantomjsPath)
+
+    chromedriver = '/usr/lib/chromium-browser/chromedriver'
+    browser = webdriver.Chrome(chromedriver)
     browser.get(url)
     browser.find_element_by_id('clickina').click()
-    time.sleep(1)
-    # browser.close()
+    print('before:'+browser.current_url)
+    browser.switch_to.window(browser.window_handles[1])
+    print('after:'+browser.current_url)
+    print('Downloading......please wait')
+    # r = requests.get(browser.current_url,stream =True)
+    # with open(name,'wb') as f:
+    #     for chunk in r.iter_content(chunk_size=1024):
+    #         if chunk:
+    #             f.write(chunk)
+    #     # for chunk in r.iter_content(chunk_size=1024*1024):
+
+    # with closing(requests.get(url,stream=True)) as response:
+    #     chunk_size =1024
+    #     content_size = int(response.headers['content-length'])
+    #     progress = ProgressBar(self.file_name(),total=content_size,unit='KB',chunk_size=chunk_size,run_status='正在下载',fin_status='下载完成')
+    # with open(name,'wb') as file:
+    #     for data in response.iter_content(chunk_size=chunk_size):
+    #         file.write(data)
+    #         progress.refresh(count=len(data))
+
+
+    print(name+'download complete')
+
+    browser.quit()
+        # .close()
 
 def get_url(url):
     # jsString = 'pingshu://cc%252Fbzmtv%255FInc%252Fdownload%252Easp%253Ffid%253D102539akb%253D%253D'
@@ -136,5 +161,7 @@ if __name__=='__main__':
     # for story in pingshu_download_list:
     #     print('{}，链接:{}\n'.format(story[0], story[1]))
     #     #print(pingshu_download_list.__len__())
-    url = 'http://www.pingshu8.com/down_294730.html'
-    download_pingshu(url)
+    name = 'testxs.mp3'
+    url = 'http://www.pingshu8.com/down_272063.html'
+    # http://www.pingshu8.com/down_294730.html'
+    download_pingshu(name,url)
